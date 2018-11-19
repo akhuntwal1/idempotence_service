@@ -1,0 +1,90 @@
+swagger: "2.0"
+info:
+  title: 'idempotence'
+  version: '1.0'
+basePath: /idempotence_identifiers
+paths:
+  /:
+    post:
+      summary: returns as many uuids as requested, unique in the scope of given client identifier
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+      parameters:
+        - name : identifier_and_count
+          in : body
+          required : true
+          schema:
+            $ref: '#/definitions/input_spec'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/output_spec'
+
+  /{{client_identifier}}:
+    get:
+      summary: return uuid_list corresponding to a client_identifier
+      parameters:
+        - name: client_identifier
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/output_spec'
+        404:
+          description: bad client_identifier
+
+    delete:
+      summary: delete uuid_list corresponding to a client_identifier
+      parameters:
+        - name: client_identifier
+          in: path
+          required: true
+          type: string
+      responses: 
+        200: 
+          description: OK
+        404:
+          description: Bad client_identifier
+
+definitions:
+  input_spec:
+    type: object
+    title: request spec specifying client identifier and count of uuids needed
+    properties:
+      client_identifier:
+        description: client identifier
+        type: string
+      count:
+        description: number of uuids needed
+        type: integer
+        format: int
+      valid_duration_in_minutes:
+        description: Validity of generated uuids to be specified in minutes
+        type: integer
+        format: int
+  output_spec:
+    type: object
+    title: returned uuids
+    properties:
+      client_identifier:
+        description: client identifier
+        type: string
+      count:
+        description: number of uuids needed
+        type: integer
+        format: int
+      expiration_time:
+        description: Date-time when the uuid(s) expiration_time
+        type: string
+      uuid_list:
+        description: array of returned uuids
+        type: array
+        items:
+          type: string
+
